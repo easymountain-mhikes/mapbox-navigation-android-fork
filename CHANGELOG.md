@@ -5,6 +5,7 @@ Mapbox welcomes participation and contributions from everyone.
 ## Unreleased
 #### Features
 #### Bug fixes and improvements
+- Modified the route line implementation so that for multi-leg routes the active leg appears above inactive route legs. [#6742](https://github.com/mapbox/mapbox-navigation-android/pull/6742)
 
 ## Mapbox Navigation SDK 2.10.0 - 20 January, 2023
 ### Changelog
