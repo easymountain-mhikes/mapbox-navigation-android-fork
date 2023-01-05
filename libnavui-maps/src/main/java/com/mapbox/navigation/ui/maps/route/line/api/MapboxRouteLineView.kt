@@ -142,6 +142,8 @@ class MapboxRouteLineView(options: MapboxRouteLineOptions) {
      * the layers if they have not yet been initialized. If you have a use case for initializing
      * the layers in advance of any API calls this method may be used.
      *
+     * If the layers already exist they will be removed and re-initialized with the options provided.
+     *
      * Each [Layer] added to the map by this class is a persistent layer - it will survive style changes.
      * This means that if the data has not changed, it does not have to be manually redrawn after a style change.
      * See [Style.addPersistentStyleLayer].
@@ -149,7 +151,23 @@ class MapboxRouteLineView(options: MapboxRouteLineOptions) {
      * @param style a valid [Style] instance
      */
     fun initializeLayers(style: Style) {
-        MapboxRouteLineUtils.initializeLayers(style, options)
+        resetLayers(style)
+    }
+
+    /**
+     * Updates the [MapboxRouteLineOptions] used for the route line related layers and initializes the layers.
+     * If the layers already exist they will be removed and re-initialized with the options provided.
+     *
+     * Each [Layer] added to the map by this class is a persistent layer - it will survive style changes.
+     * This means that if the data has not changed, it does not have to be manually redrawn after a style change.
+     * See [Style.addPersistentStyleLayer].
+     *
+     * @param style a valid [Style] instance
+     * @param options used for the route line related layers.
+     */
+    fun initializeLayers(style: Style, options: MapboxRouteLineOptions) {
+        this.options = options
+        resetLayers(style)
     }
 
     /**
@@ -861,5 +879,27 @@ class MapboxRouteLineView(options: MapboxRouteLineOptions) {
                     style.setStyleLayerProperty(it, "line-width", this)
                 }
             }
+    }
+
+    private fun resetLayers(style: Style) {
+        sourceToFeatureMap.clear()
+        sourceToFeatureMap[MapboxRouteLineUtils.layerGroup1SourceKey] = RouteLineFeatureId(null)
+        sourceToFeatureMap[MapboxRouteLineUtils.layerGroup2SourceKey] = RouteLineFeatureId(null)
+        sourceToFeatureMap[MapboxRouteLineUtils.layerGroup3SourceKey] = RouteLineFeatureId(null)
+        primaryRouteLineLayerGroup = setOf()
+        listOf(
+            RouteLayerConstants.LAYER_GROUP_1_SOURCE_ID,
+            RouteLayerConstants.LAYER_GROUP_2_SOURCE_ID,
+            RouteLayerConstants.LAYER_GROUP_3_SOURCE_ID,
+            RouteLayerConstants.WAYPOINT_SOURCE_ID
+        ).forEach {
+            updateSource(
+                style,
+                it,
+                FeatureCollection.fromFeatures(listOf())
+            )
+        }
+        MapboxRouteLineUtils.removeLayersAndSources(style)
+        MapboxRouteLineUtils.initializeLayers(style, options)
     }
 }

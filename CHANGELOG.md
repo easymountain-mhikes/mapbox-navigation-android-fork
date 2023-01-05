@@ -30,6 +30,7 @@ Mapbox welcomes participation and contributions from everyone.
 - Each newly instantiated MapboxRouteArrowView class will initialize the layers with the provided options on the first render call. Previously this would only be done if the layers hadn't already been initialized.  [#6466](https://github.com/mapbox/mapbox-navigation-android/pull/6466)
 - Fixed an issue where the first voice instruction might have been played twice. [#6766](https://github.com/mapbox/mapbox-navigation-android/pull/6766)
 - Changed distance formatting: now all the imperial distances down to 0.1 miles will be represented in miles, while the smaller ones - in feet. [#6775](https://github.com/mapbox/mapbox-navigation-android/pull/6775)
+- Updated behavior of `MapboxRouteLineView::initializeLayers` to always reset the route line related layers with the options provided even if it means removing existing layers in order to apply the options. [#6793](https://github.com/mapbox/mapbox-navigation-android/pull/6793)
 
 ## Mapbox Navigation SDK 2.10.0-rc.1 - 16 December, 2022
 ### Changelog
