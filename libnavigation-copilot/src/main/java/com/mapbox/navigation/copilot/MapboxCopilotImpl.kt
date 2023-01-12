@@ -119,7 +119,7 @@ internal class MapboxCopilotImpl(
      * start
      */
     fun start() {
-        registerUserFeedbackCallback(userFeedbackCallback)
+        registerUserFeedbackCallback(mapboxNavigation, userFeedbackCallback)
         if (isMapboxNavigationAppSetup) {
             MapboxNavigationApp.lifecycleOwner.lifecycle.addObserver(
                 foregroundBackgroundLifecycleObserver
@@ -136,7 +136,7 @@ internal class MapboxCopilotImpl(
      * stop
      */
     fun stop() {
-        unregisterUserFeedbackCallback(userFeedbackCallback)
+        unregisterUserFeedbackCallback(mapboxNavigation, userFeedbackCallback)
         if (isMapboxNavigationAppSetup) {
             MapboxNavigationApp.lifecycleOwner.lifecycle.removeObserver(
                 foregroundBackgroundLifecycleObserver

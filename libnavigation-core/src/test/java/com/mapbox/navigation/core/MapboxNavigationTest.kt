@@ -23,7 +23,6 @@ import com.mapbox.navigation.core.directions.session.RoutesUpdatedResult
 import com.mapbox.navigation.core.internal.HistoryRecordingStateChangeObserver
 import com.mapbox.navigation.core.internal.extensions.registerHistoryRecordingStateChangeObserver
 import com.mapbox.navigation.core.internal.extensions.unregisterHistoryRecordingStateChangeObserver
-import com.mapbox.navigation.core.internal.telemetry.NavigationCustomEventType
 import com.mapbox.navigation.core.navigator.CacheHandleWrapper
 import com.mapbox.navigation.core.preview.RoutesPreview
 import com.mapbox.navigation.core.reroute.NavigationRerouteController
@@ -31,7 +30,6 @@ import com.mapbox.navigation.core.reroute.RerouteController
 import com.mapbox.navigation.core.reroute.RerouteState
 import com.mapbox.navigation.core.routerefresh.RefreshedRouteInfo
 import com.mapbox.navigation.core.routerefresh.RouteRefreshStatesObserver
-import com.mapbox.navigation.core.telemetry.MapboxNavigationTelemetry
 import com.mapbox.navigation.core.testutil.createRoutesUpdatedResult
 import com.mapbox.navigation.core.trip.session.LocationObserver
 import com.mapbox.navigation.core.trip.session.NativeSetRouteError
@@ -369,69 +367,6 @@ internal class MapboxNavigationTest : MapboxNavigationBaseTest() {
         mapboxNavigation.onDestroy()
 
         verify(exactly = 1) { navigationSession.unregisterAllNavigationSessionStateObservers() }
-    }
-
-    @Test
-    fun telemetryIsDisabled() {
-        every { TelemetryUtilsDelegate.getEventsCollectionState() } returns false
-
-        createMapboxNavigation()
-        mapboxNavigation.onDestroy()
-
-        verify(exactly = 0) {
-            MapboxNavigationTelemetry.initialize(any(), any(), any(), any())
-        }
-        verify(exactly = 0) { MapboxNavigationTelemetry.destroy(any()) }
-    }
-
-    @ExperimentalPreviewMapboxNavigationAPI
-    @Test(expected = IllegalStateException::class)
-    fun telemetryIsDisabledTryToGetFeedbackMetadataWrapper() {
-        every { TelemetryUtilsDelegate.getEventsCollectionState() } returns false
-
-        createMapboxNavigation()
-        mapboxNavigation.provideFeedbackMetadataWrapper()
-    }
-
-    @ExperimentalPreviewMapboxNavigationAPI
-    fun telemetryIsDisabledTryToPostFeedback() {
-        every { TelemetryUtilsDelegate.getEventsCollectionState() } returns false
-
-        createMapboxNavigation()
-
-        mapboxNavigation.postUserFeedback(mockk(), mockk(), mockk(), mockk(), mockk())
-        mapboxNavigation.postUserFeedback(mockk(), mockk(), mockk(), mockk(), mockk(), mockk())
-
-        verify(exactly = 0) {
-            MapboxNavigationTelemetry.postUserFeedback(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-            )
-        }
-    }
-
-    @Test
-    fun unregisterAllTelemetryObservers() {
-        createMapboxNavigation()
-        mapboxNavigation.onDestroy()
-
-        verify(exactly = 1) { MapboxNavigationTelemetry.destroy(eq(mapboxNavigation)) }
-    }
-
-    @Test
-    fun unregisterAllTelemetryObserversIsCalledAfterTripSessionStop() {
-        createMapboxNavigation()
-        mapboxNavigation.onDestroy()
-
-        verifyOrder {
-            tripSession.stop()
-            MapboxNavigationTelemetry.destroy(mapboxNavigation)
-        }
     }
 
     @Test
@@ -831,6 +766,7 @@ internal class MapboxNavigationTest : MapboxNavigationBaseTest() {
                 capture(slot),
                 any(),
                 any(),
+                any(),
             )
         } returns navigator
         val options = navigationOptions.toBuilder()
@@ -851,6 +787,7 @@ internal class MapboxNavigationTest : MapboxNavigationBaseTest() {
                 any(),
                 any(),
                 capture(slot),
+                any(),
                 any(),
                 any(),
             )
@@ -1143,6 +1080,7 @@ internal class MapboxNavigationTest : MapboxNavigationBaseTest() {
                 capture(slot),
                 any(),
                 any(),
+                any(),
             )
         } returns navigator
         val tilesVersion = "tilesVersion"
@@ -1184,6 +1122,7 @@ internal class MapboxNavigationTest : MapboxNavigationBaseTest() {
                 capture(tileConfigSlot),
                 any(),
                 any(),
+                any(),
             )
         } just Runs
 
@@ -1216,16 +1155,17 @@ internal class MapboxNavigationTest : MapboxNavigationBaseTest() {
 
             mapboxNavigation = MapboxNavigation(navigationOptions, threadController)
 
-            val tileConfigSlot = slot<TilesConfig>()
-            every {
-                navigator.recreate(
-                    any(),
-                    any(),
-                    capture(tileConfigSlot),
-                    any(),
-                    any(),
-                )
-            } just Runs
+        val tileConfigSlot = slot<TilesConfig>()
+        every {
+            navigator.recreate(
+                any(),
+                any(),
+                capture(tileConfigSlot),
+                any(),
+                any(),
+                any(),
+            )
+        } just Runs
 
             fallbackObserverSlot.captured.onCanReturnToLatest("")
 
@@ -1866,30 +1806,6 @@ internal class MapboxNavigationTest : MapboxNavigationBaseTest() {
         mapboxNavigation.setRerouteController(newController)
 
         assertNull(mapboxNavigation.getRerouteController())
-    }
-
-    @Test
-    fun `when telemetry is enabled custom event is posted`() = coroutineRule.runBlockingTest {
-        createMapboxNavigation()
-        every { TelemetryUtilsDelegate.getEventsCollectionState() } returns true
-        every { MapboxNavigationTelemetry.postCustomEvent(any(), any(), any()) } just Runs
-        every { MapboxNavigationTelemetry.destroy(any()) } just Runs
-
-        mapboxNavigation.postCustomEvent("", NavigationCustomEventType.ANALYTICS, "1.0")
-
-        verify(exactly = 1) { MapboxNavigationTelemetry.postCustomEvent(any(), any(), any()) }
-    }
-
-    @Test
-    fun `when telemetry is disabled custom event is not posted`() = coroutineRule.runBlockingTest {
-        createMapboxNavigation()
-        every { TelemetryUtilsDelegate.getEventsCollectionState() } returns false
-        every { MapboxNavigationTelemetry.postCustomEvent(any(), any(), any()) } just Runs
-        every { MapboxNavigationTelemetry.destroy(any()) } just Runs
-
-        mapboxNavigation.postCustomEvent("", NavigationCustomEventType.ANALYTICS, "1.0")
-
-        verify(exactly = 0) { MapboxNavigationTelemetry.postCustomEvent(any(), any(), any()) }
     }
 
     @Test
