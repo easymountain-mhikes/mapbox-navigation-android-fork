@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/mainLayout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/deliveryRecipient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Homer Simpson"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/deliveryAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="742 Evergreen Terrace"/>
+
+        <TextView
+            android:id="@+id/deliveryAddressCity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Springfield"/>
+
+        <TextView
+            android:id="@+id/deliveryNotesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notes:"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/deliveryNotes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BEWARE OF DOG. If residents are not at home leave package at front door."/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSomeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Click Me"
+            android:layout_marginTop="8dp"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</merge>
