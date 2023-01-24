@@ -529,6 +529,9 @@ package com.mapbox.navigation.core.replay.history {
     property public final Double? time;
   }
 
+  public final class ReplayEventLocationMapperKt {
+  }
+
   public final class ReplayEventUpdateLocation implements com.mapbox.navigation.core.replay.history.ReplayEventBase {
     ctor public ReplayEventUpdateLocation(@com.google.gson.annotations.SerializedName("event_timestamp") double eventTimestamp, @com.google.gson.annotations.SerializedName("location") com.mapbox.navigation.core.replay.history.ReplayEventLocation location);
     method public double component1();
