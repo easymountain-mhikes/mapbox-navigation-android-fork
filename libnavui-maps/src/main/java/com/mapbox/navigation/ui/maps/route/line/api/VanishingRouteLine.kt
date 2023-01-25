@@ -15,6 +15,7 @@ import com.mapbox.navigation.ui.maps.route.line.model.VanishingPointState
 import com.mapbox.navigation.ui.maps.route.line.model.VanishingRouteLineExpressions
 import com.mapbox.navigation.ui.utils.internal.ifNonNull
 import com.mapbox.navigation.utils.internal.logD
+import kotlin.math.abs
 
 /**
  * This class implements a feature that can change the appearance of the route line behind the puck.
@@ -107,7 +108,8 @@ internal class VanishingRouteLine {
         }
 
         if (vanishingPointState == VanishingPointState.ONLY_INCREASE_PROGRESS &&
-            vanishPointOffset > offset
+            //vanishPointOffset > offset
+            abs(vanishPointOffset - offset) > 0.95
         ) {
             return null
         }
