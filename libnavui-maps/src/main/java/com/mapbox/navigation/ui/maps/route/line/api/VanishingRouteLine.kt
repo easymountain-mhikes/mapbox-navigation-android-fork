@@ -54,7 +54,15 @@ internal class VanishingRouteLine {
     fun updateVanishingPointState(routeProgressState: RouteProgressState) {
         vanishingPointState = when (routeProgressState) {
             RouteProgressState.TRACKING -> VanishingPointState.ENABLED
-            RouteProgressState.COMPLETE -> VanishingPointState.ONLY_INCREASE_PROGRESS
+            /**
+             * DO-951 fix : by preventing VanishingPointState to change to ONLY_INCREASE_PROGRESS,
+             * we prevent the getOffset(..) method from returning null.
+             * This was the cause of vanishing route not being recalculated
+             * once the user went through the COMPLETE state during a navigation.
+             * The root cause remains that this COMPLETE state never gets back
+             * to the TRACKING state when the user continue its way after the the arrival.
+             */
+            RouteProgressState.COMPLETE -> VanishingPointState.ENABLED
             else -> VanishingPointState.DISABLED
         }
     }
