@@ -54,7 +54,7 @@ internal class VanishingRouteLine {
     fun updateVanishingPointState(routeProgressState: RouteProgressState) {
         vanishingPointState = when (routeProgressState) {
             RouteProgressState.TRACKING -> VanishingPointState.ENABLED
-            RouteProgressState.COMPLETE -> VanishingPointState.ONLY_INCREASE_PROGRESS
+            RouteProgressState.COMPLETE -> VanishingPointState.ENABLED
             else -> VanishingPointState.DISABLED
         }
     }
